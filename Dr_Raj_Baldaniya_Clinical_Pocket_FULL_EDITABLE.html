@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b7285"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Clinical Pocket">
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Dr. Raj Baldaniya – Clinical Pocket</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f8f9;color:#172126;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:#0b7285;color:#fff;padding:18px;position:sticky;top:0;z-index:10}h1{font-size:20px;margin:0}.small{font-size:12px;opacity:.85}
+.search{width:100%;padding:13px;border:0;border-radius:12px;margin-top:12px;font-size:16px}
+nav{display:flex;gap:7px;overflow:auto;margin-top:10px}nav button,.btn{border:0;border-radius:10px;padding:9px 11px;background:white;color:#15515b;font-weight:650}
+main{max-width:950px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card,.panel,.note{background:#fff;border:1px solid #e0e9eb;border-radius:15px;padding:14px;margin:9px 0;box-shadow:0 2px 10px #0000000b}.card{cursor:pointer;text-align:left;width:100%;font:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.card b{display:block;margin-bottom:4px}.muted{font-size:12px;color:#6b797d}.tag{font-size:11px;background:#e8f7f8;color:#075b67;border-radius:20px;padding:4px 8px;display:inline-block;margin:2px}.note h3{margin:7px 0}.actions{display:flex;gap:7px;flex-wrap:wrap}.primary{background:#0b7285!important;color:#fff!important}.danger{background:#ffe8e8!important;color:#9f2929!important}
+input,textarea,select{width:100%;padding:11px;border:1px solid #cbd9dc;border-radius:9px;margin:5px 0 9px;font-size:14px}textarea{min-height:150px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.title{font-weight:750;margin:15px 0 8px}.result{font-size:19px;font-weight:750;margin-top:9px}.warn{background:#fff6df;border-left:4px solid #f59f00;border-radius:8px;padding:10px;font-size:12px;line-height:1.45}.empty{text-align:center;padding:35px;color:#6d797d}
+@media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
+</style></head><body>
+<header><h1>🩺 Dr. Raj Baldaniya – Clinical Pocket</h1><div class="small">Searchable personal clinical knowledge app</div>
+<input id="search" class="search" placeholder="🔎 Search disease, drug, protocol, note...">
+<nav><button onclick="home()">Home</button><button onclick="notesView()">Notes</button><button onclick="add()">＋ Add</button><button onclick="calculators()">🧮 Calculators</button><button onclick="favorites()">⭐ Favorites</button><button id="install" style="display:none" onclick="installApp()">📲 Install</button></nav></header>
+<main id="app"></main>
+<script>
+const starter=[
+{id:1,cat:"👶 Pediatrics",title:"Fever in child – quick approach",tags:"pediatrics fever assessment",body:"Assess age, appearance, hydration, respiratory status and circulation first. Document temperature and weight. Look for altered consciousness, seizures, respiratory distress, poor perfusion, severe dehydration, petechiae/purpura or persistent inconsolable crying.",fav:false},
+{id:2,cat:"👶 Pediatrics",title:"Bronchiolitis – quick notes",tags:"pediatrics cough wheeze bronchiolitis",body:"Usually a clinical diagnosis in infants with coryzal symptoms followed by cough, tachypnea and wheeze/crackles. Assess feeding, hydration, oxygen saturation and work of breathing. Management is mainly supportive.",fav:false},
+{id:3,cat:"💉 Vaccination",title:"Childhood vaccination – index",tags:"vaccination immunization child",body:"Keep a current national immunization schedule. Record vaccine name, dose, route, site, date and batch/lot where appropriate. Verify the latest Government of India/National Immunization Schedule before clinical use.",fav:false},
+{id:4,cat:"💊 Drugs",title:"Drug reference template",tags:"drug dose contraindication interaction",body:"Generic name:\\nIndications:\\nAdult dose:\\nPediatric dose:\\nMaximum dose:\\nContraindications:\\nRenal/hepatic adjustment:\\nImportant interactions:\\nMonitoring:",fav:false},
+{id:5,cat:"🚑 Emergency",title:"Emergency assessment – ABCDE",tags:"emergency ABCDE resuscitation",body:"A: Airway. B: Breathing and SpO₂. C: Circulation, pulse, BP and perfusion. D: Disability, mental status and glucose. E: Exposure and focused examination. Follow current BLS/ALS/PALS/NRP protocols appropriate to the patient and setting.",fav:false},
+{id:6,cat:"🧪 Investigations",title:"Common investigation checklist",tags:"CBC CRP LFT RFT electrolytes",body:"Document the clinical question before ordering tests. Select investigations according to clinical indication and interpret results in clinical context.",fav:false},
+{id:7,cat:"📋 Templates",title:"OPD clinical note",tags:"OPD case sheet history examination",body:"Chief complaints:\\nHistory of present illness:\\nPast history:\\nDrug/allergy history:\\nVitals:\\nExamination:\\nProvisional diagnosis / differential:\\nInvestigations:\\nPlan:",fav:false},
+{id:8,cat:"📋 Templates",title:"Admission note",tags:"admission hospital case sheet",body:"Reason for admission:\\nRelevant history:\\nVitals:\\nSystemic examination:\\nWorking diagnosis:\\nInvestigations:\\nTreatment and monitoring plan:",fav:false}
+];
+let data=JSON.parse(localStorage.getItem("rb_clinical_notes")||"null")||starter;
+let categories=JSON.parse(localStorage.getItem("rb_clinical_categories")||"null");
+if(!Array.isArray(categories)||!categories.length){
+  categories=[...new Set(data.map(n=>n.cat))].map((name,i)=>({id:"cat_"+i,name}));
+  localStorage.setItem("rb_clinical_categories",JSON.stringify(categories));
+}
+function syncCategories(){let known=new Set(categories.map(c=>c.name));data.forEach(n=>{if(!known.has(n.cat)){categories.push({id:"cat_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),name:n.cat});known.add(n.cat)}});localStorage.setItem("rb_clinical_categories",JSON.stringify(categories))}
+syncCategories();
+const app=document.getElementById("app"), search=document.getElementById("search"), installBtn=document.getElementById("install");
+function save(){localStorage.setItem("rb_clinical_notes",JSON.stringify(data));localStorage.setItem("rb_clinical_categories",JSON.stringify(categories))}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+function home(){
+  search.value="";
+  app.innerHTML=`<div class="title">Quick Access</div>
+  <div class="grid">${categories.map(c=>`<div class="card" data-category="${esc(c.name)}">
+    <div class="actions" style="justify-content:space-between;align-items:center">
+      <b>${esc(c.name)}</b>
+      <span class="actions">
+        <button type="button" class="btn" data-edit-category="${esc(c.id)}" aria-label="Edit ${esc(c.name)}">✏️</button>
+        <button type="button" class="btn" data-add-category-note="${esc(c.name)}" aria-label="Add note to ${esc(c.name)}">＋</button>
+      </span>
+    </div>
+    <span class="muted">${data.filter(n=>n.cat===c.name).length} notes</span>
+  </div>`).join("")}</div>
+  <div class="actions" style="margin:12px 0">
+    <button type="button" class="btn primary" data-action="add-category">＋ Add new card / category</button>
+    <button type="button" class="btn" data-action="manage-categories">⚙️ Manage cards</button>
+  </div>
+  <div class="title">Tools</div>
+  <div class="grid">
+    <button type="button" class="card" data-action="calculators"><b>🧮 Calculators</b><span class="muted">Dose & fluid mathematics</span></button>
+    <button type="button" class="card" data-action="add"><b>＋ Add clinical note</b><span class="muted">Your own searchable notes</span></button>
+  </div>
+  <div class="warn">Personal reference app. Verify current guidelines, formularies and patient-specific dosing before clinical use. Do not store identifiable patient information in this simple app.</div>`
+}
+
+function notesView(){search.value="";render(data)}
+function favorites(){search.value="";render(data.filter(n=>n.fav))}
+function category(c){
+  search.value="";
+  let arr=data.filter(n=>n.cat===c);
+  app.innerHTML=`<div class="actions">
+    <button type="button" class="btn" data-action="home">← Home</button>
+    <button type="button" class="btn primary" data-add-category-note="${esc(c)}">＋ Add note to ${esc(c)}</button>
+    <button type="button" class="btn" data-edit-category-name="${esc(c)}">✏️ Edit card</button>
+  </div>
+  <div class="title">${esc(c)}</div>
+  ${arr.length?arr.map(n=>`<article class="note">
+    <span class="tag">${esc(n.cat)}</span><h3>${esc(n.title)}</h3>
+    <div class="muted">${esc(n.tags||"")}</div><p>${esc(n.body).replace(/\n/g,"<br>")}</p>
+    <div class="actions">
+      <button type="button" class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button>
+      <button type="button" class="btn" data-edit-note="${n.id}">Edit</button>
+      <button type="button" class="btn danger" data-delete-note="${n.id}">Delete</button>
+    </div>
+  </article>`).join(""):'<div class="empty">No notes in this card yet. Tap “Add note” to write your first detail.</div>'}`
+}
+
+function render(arr){
+  app.innerHTML=arr.length?arr.map(n=>`<article class="note">
+    <span class="tag">${esc(n.cat)}</span><h3>${esc(n.title)}</h3>
+    <div class="muted">${esc(n.tags||"")}</div><p>${esc(n.body).replace(/\n/g,"<br>")}</p>
+    <div class="actions">
+      <button type="button" class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button>
+      <button type="button" class="btn" data-edit-note="${n.id}">Edit</button>
+      <button type="button" class="btn danger" data-delete-note="${n.id}">Delete</button>
+    </div>
+  </article>`).join(""):'<div class="empty">No matching notes.</div>'
+}
+
+function add(){form()}
+function edit(id){form(data.find(n=>n.id===id))}
+function form(n=null){
+  n=n||{id:0,cat:(categories[0]?.name||"📁 General"),title:"",tags:"",body:""};
+  app.innerHTML=`<div class="panel">
+    <div class="actions"><button type="button" class="btn" data-action="home">← Home</button></div>
+    <div class="title">${n.id?"Edit":"Add"} clinical note</div>
+    <label>Category / Card</label>
+    <select id="cat">${categories.map(c=>`<option value="${esc(c.name)}" ${c.name===n.cat?"selected":""}>${esc(c.name)}</option>`).join("")}</select>
+    <label>Title</label><input id="ttl" value="${esc(n.title)}" placeholder="e.g. Acute asthma approach">
+    <label>Search tags</label><input id="tags" value="${esc(n.tags||"")}" placeholder="e.g. asthma, emergency, pediatric">
+    <label>Note / Details</label><textarea id="body" placeholder="Write your clinical details here...">${esc(n.body)}</textarea>
+    <div class="actions">
+      <button type="button" class="btn primary" data-save-note="${n.id}">Save</button>
+      <button type="button" class="btn" data-action="home">Cancel</button>
+    </div>
+  </div>`
+}
+
+function saveNote(id){
+  let old=data.find(n=>n.id===id);
+  let n={id:id||Date.now(),cat:document.getElementById("cat").value,title:document.getElementById("ttl").value.trim()||"Untitled",tags:document.getElementById("tags").value.trim(),body:document.getElementById("body").value.trim(),fav:old?old.fav:false};
+  data=id?data.map(x=>x.id===id?n:x):[n,...data];
+  syncCategories();save();category(n.cat)
+}
+function fav(id){let n=data.find(x=>x.id===id);if(n){n.fav=!n.fav;save()}notesView()}
+function removeNote(id){if(confirm("Delete this note?")){data=data.filter(n=>n.id!==id);save();notesView()}}
+
+function addCategory(){
+  app.innerHTML=`<div class="panel">
+    <div class="title">＋ Add new card / category</div>
+    <label>Card name</label><input id="newCat" placeholder="e.g. Gynaecology">
+    <div class="muted">You can include an emoji, for example: 🩺 Gynaecology</div>
+    <div class="actions">
+      <button type="button" class="btn primary" data-save-category>Save card</button>
+      <button type="button" class="btn" data-action="home">Cancel</button>
+    </div>
+  </div>`
+}
+function saveCategory(){
+  let name=document.getElementById("newCat").value.trim();
+  if(!name){alert("Please enter a card name.");return}
+  if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){alert("This card already exists.");return}
+  categories.push({id:"cat_"+Date.now(),name});save();home()
+}
+function editCategory(name){
+  let c=categories.find(x=>x.name===name); if(!c)return;
+  app.innerHTML=`<div class="panel">
+    <div class="title">✏️ Edit card</div>
+    <label>Card name</label><input id="editCat" value="${esc(c.name)}">
+    <div class="actions">
+      <button type="button" class="btn primary" data-update-category="${esc(c.id)}">Save changes</button>
+      <button type="button" class="btn danger" data-delete-category="${esc(c.id)}">Delete card</button>
+      <button type="button" class="btn" data-action="home">Cancel</button>
+    </div>
+    <div class="warn">Renaming a card also updates all notes currently inside that card. Deleting a card will ask you to confirm and will delete its notes.</div>
+  </div>`
+}
+function updateCategory(id){
+  let c=categories.find(x=>x.id===id); if(!c)return;
+  let newName=document.getElementById("editCat").value.trim();
+  if(!newName){alert("Please enter a card name.");return}
+  if(categories.some(x=>x.id!==id&&x.name.toLowerCase()===newName.toLowerCase())){alert("This card already exists.");return}
+  let oldName=c.name;c.name=newName;
+  data=data.map(n=>n.cat===oldName?{...n,cat:newName}:n);
+  save();home()
+}
+function deleteCategory(id){
+  let c=categories.find(x=>x.id===id);if(!c)return;
+  let count=data.filter(n=>n.cat===c.name).length;
+  if(confirm(`Delete "${c.name}" and its ${count} note(s)? This cannot be undone.`)){
+    categories=categories.filter(x=>x.id!==id);
+    data=data.filter(n=>n.cat!==c.name);
+    save();home()
+  }
+}
+function manageCategories(){
+  app.innerHTML=`<div class="actions"><button type="button" class="btn" data-action="home">← Home</button><button type="button" class="btn primary" data-action="add-category">＋ Add card</button></div>
+  <div class="title">⚙️ Manage cards</div>
+  ${categories.map(c=>`<article class="note"><h3>${esc(c.name)}</h3><div class="muted">${data.filter(n=>n.cat===c.name).length} notes</div><div class="actions"><button type="button" class="btn" data-edit-category="${esc(c.id)}">✏️ Edit</button><button type="button" class="btn" data-add-category-note="${esc(c.name)}">＋ Add note</button><button type="button" class="btn danger" data-delete-category="${esc(c.id)}">Delete</button></div></article>`).join("")}`
+}
+function calculators(){app.innerHTML=`<div class="panel"><div class="title">💊 Weight-based dose mathematics</div><label>Weight (kg)</label><input id="w" type="number" step="0.1"><label>Dose (mg/kg/dose)</label><input id="d" type="number" step="0.01"><button class="btn primary" onclick="doseCalc()">Calculate</button><div id="dr"></div></div><div class="panel"><div class="title">💧 4-2-1 maintenance fluid mathematics</div><label>Weight (kg)</label><input id="fw" type="number" step="0.1"><button class="btn primary" onclick="fluidCalc()">Calculate</button><div id="fr"></div></div><div class="panel"><div class="title">⚖️ Dose from concentration</div><label>Required dose (mg)</label><input id="need" type="number" step="0.01"><label>Concentration (mg/mL)</label><input id="conc" type="number" step="0.01"><button class="btn primary" onclick="volCalc()">Calculate</button><div id="vr"></div></div><div class="warn">Calculators perform arithmetic only. Confirm indication, dosing interval, maximum dose, concentration, contraindications, renal/hepatic adjustments and current clinical guidance before prescribing.</div>`}
+function doseCalc(){let w=+document.getElementById("w").value,d=+document.getElementById("d").value;document.getElementById("dr").innerHTML=w>0&&d>=0?`<div class="result">${(w*d).toFixed(2)} mg/dose</div>`:"Enter valid values."}
+function fluidCalc(){let w=+document.getElementById("fw").value;if(w<=0){fr.innerHTML="Enter valid weight.";return}let h=w<=10?4*w:w<=20?40+2*(w-10):60+w-20;fr.innerHTML=`<div class="result">${h.toFixed(1)} mL/hour</div><div class="muted">${(h*24).toFixed(0)} mL/day</div>`}
+function volCalc(){let n=+document.getElementById("need").value,c=+document.getElementById("conc").value;document.getElementById("vr").innerHTML=n>=0&&c>0?`<div class="result">${(n/c).toFixed(2)} mL</div>`:"Enter valid values."}
+search.addEventListener("input",()=>{let s=search.value.toLowerCase().trim();if(!s){home();return}render(data.filter(n=>(n.title+" "+n.cat+" "+n.tags+" "+n.body).toLowerCase().includes(s)))});
+app.addEventListener("click",e=>{
+  const card=e.target.closest("[data-category]");
+  if(card && !e.target.closest("button")){category(card.getAttribute("data-category"));return}
+  const action=e.target.closest("[data-action]");
+  if(action){
+    const a=action.getAttribute("data-action");
+    if(a==="home")home();
+    else if(a==="add")add();
+    else if(a==="calculators")calculators();
+    else if(a==="add-category")addCategory();
+    else if(a==="manage-categories")manageCategories();
+    return;
+  }
+  const addNote=e.target.closest("[data-add-category-note]");
+  if(addNote){form({id:0,cat:addNote.getAttribute("data-add-category-note"),title:"",tags:"",body:""});return}
+  const editCatBtn=e.target.closest("[data-edit-category]");
+  if(editCatBtn){let c=categories.find(x=>x.id===editCatBtn.getAttribute("data-edit-category"));if(c)editCategory(c.name);return}
+  const editCatName=e.target.closest("[data-edit-category-name]");
+  if(editCatName){editCategory(editCatName.getAttribute("data-edit-category-name"));return}
+  const saveCat=e.target.closest("[data-save-category]");
+  if(saveCat){saveCategory();return}
+  const updateCat=e.target.closest("[data-update-category]");
+  if(updateCat){updateCategory(updateCat.getAttribute("data-update-category"));return}
+  const deleteCat=e.target.closest("[data-delete-category]");
+  if(deleteCat){deleteCategory(deleteCat.getAttribute("data-delete-category"));return}
+  const saveNoteBtn=e.target.closest("[data-save-note]");
+  if(saveNoteBtn){saveNote(Number(saveNoteBtn.getAttribute("data-save-note")));return}
+  const editNote=e.target.closest("[data-edit-note]");
+  if(editNote){edit(Number(editNote.getAttribute("data-edit-note")));return}
+  const favBtn=e.target.closest("[data-fav]");
+  if(favBtn){fav(Number(favBtn.getAttribute("data-fav")));return}
+  const delNote=e.target.closest("[data-delete-note]");
+  if(delNote){removeNote(Number(delNote.getAttribute("data-delete-note")));return}
+});
+let deferred=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;installBtn.style.display="inline-block"});async function installApp(){if(deferred){deferred.prompt();await deferred.userChoice;deferred=null;installBtn.style.display="none"}else alert("On iPhone/iPad: open this app in Safari → Share → Add to Home Screen.");}
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+home();
+</script></body></html>
