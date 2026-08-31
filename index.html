@@ -13,214 +13,206 @@ nav{display:flex;gap:7px;overflow:auto;margin-top:10px}nav button,.btn{border:0;
 main{max-width:950px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card,.panel,.note{background:#fff;border:1px solid #e0e9eb;border-radius:15px;padding:14px;margin:9px 0;box-shadow:0 2px 10px #0000000b}.card{cursor:pointer;text-align:left;width:100%;font:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.card b{display:block;margin-bottom:4px}.muted{font-size:12px;color:#6b797d}.tag{font-size:11px;background:#e8f7f8;color:#075b67;border-radius:20px;padding:4px 8px;display:inline-block;margin:2px}.note h3{margin:7px 0}.actions{display:flex;gap:7px;flex-wrap:wrap}.primary{background:#0b7285!important;color:#fff!important}.danger{background:#ffe8e8!important;color:#9f2929!important}
 input,textarea,select{width:100%;padding:11px;border:1px solid #cbd9dc;border-radius:9px;margin:5px 0 9px;font-size:14px}textarea{min-height:150px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.title{font-weight:750;margin:15px 0 8px}.result{font-size:19px;font-weight:750;margin-top:9px}.warn{background:#fff6df;border-left:4px solid #f59f00;border-radius:8px;padding:10px;font-size:12px;line-height:1.45}.empty{text-align:center;padding:35px;color:#6d797d}
 @media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
+.section-editor{margin:8px 0;background:#f8fbfc}.section-editor textarea{min-height:110px}</style><style>
+.attachment{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px;border:1px solid #dce7ea;border-radius:10px;margin:6px 0;background:#fff}
+.attachments-panel{margin-top:12px}.section-editor{margin:8px 0}
 </style></head><body>
-<header><h1>🩺 Dr. Raj Baldaniya – Clinical Pocket</h1><div class="small">Searchable personal clinical knowledge app</div>
+<header><h1>🩺 Dr. Raj Baldaniya – Clinical Pocket</h1><div class="small">Searchable personal clinical knowledge app • Main headline → Disease/topic → Sections</div>
 <input id="search" class="search" placeholder="🔎 Search disease, drug, protocol, note...">
 <nav><button onclick="home()">Home</button><button onclick="notesView()">Notes</button><button onclick="add()">＋ Add</button><button onclick="calculators()">🧮 Calculators</button><button onclick="favorites()">⭐ Favorites</button><button id="install" style="display:none" onclick="installApp()">📲 Install</button></nav></header>
 <main id="app"></main>
 <script>
 const starter=[
-{id:1,cat:"👶 Pediatrics",title:"Fever in child – quick approach",tags:"pediatrics fever assessment",body:"Assess age, appearance, hydration, respiratory status and circulation first. Document temperature and weight. Look for altered consciousness, seizures, respiratory distress, poor perfusion, severe dehydration, petechiae/purpura or persistent inconsolable crying.",fav:false},
-{id:2,cat:"👶 Pediatrics",title:"Bronchiolitis – quick notes",tags:"pediatrics cough wheeze bronchiolitis",body:"Usually a clinical diagnosis in infants with coryzal symptoms followed by cough, tachypnea and wheeze/crackles. Assess feeding, hydration, oxygen saturation and work of breathing. Management is mainly supportive.",fav:false},
-{id:3,cat:"💉 Vaccination",title:"Childhood vaccination – index",tags:"vaccination immunization child",body:"Keep a current national immunization schedule. Record vaccine name, dose, route, site, date and batch/lot where appropriate. Verify the latest Government of India/National Immunization Schedule before clinical use.",fav:false},
-{id:4,cat:"💊 Drugs",title:"Drug reference template",tags:"drug dose contraindication interaction",body:"Generic name:\\nIndications:\\nAdult dose:\\nPediatric dose:\\nMaximum dose:\\nContraindications:\\nRenal/hepatic adjustment:\\nImportant interactions:\\nMonitoring:",fav:false},
-{id:5,cat:"🚑 Emergency",title:"Emergency assessment – ABCDE",tags:"emergency ABCDE resuscitation",body:"A: Airway. B: Breathing and SpO₂. C: Circulation, pulse, BP and perfusion. D: Disability, mental status and glucose. E: Exposure and focused examination. Follow current BLS/ALS/PALS/NRP protocols appropriate to the patient and setting.",fav:false},
-{id:6,cat:"🧪 Investigations",title:"Common investigation checklist",tags:"CBC CRP LFT RFT electrolytes",body:"Document the clinical question before ordering tests. Select investigations according to clinical indication and interpret results in clinical context.",fav:false},
-{id:7,cat:"📋 Templates",title:"OPD clinical note",tags:"OPD case sheet history examination",body:"Chief complaints:\\nHistory of present illness:\\nPast history:\\nDrug/allergy history:\\nVitals:\\nExamination:\\nProvisional diagnosis / differential:\\nInvestigations:\\nPlan:",fav:false},
-{id:8,cat:"📋 Templates",title:"Admission note",tags:"admission hospital case sheet",body:"Reason for admission:\\nRelevant history:\\nVitals:\\nSystemic examination:\\nWorking diagnosis:\\nInvestigations:\\nTreatment and monitoring plan:",fav:false}
+{id:1,cat:"👶 Pediatrics",title:"Fever in child – quick approach",tags:"pediatrics fever assessment",body:"Assess age, appearance, hydration, respiratory status and circulation first.",sections:[["Clinical approach","Assess age, appearance, hydration, respiratory status and circulation first."],["Red flags","Altered consciousness, seizures, respiratory distress, poor perfusion, severe dehydration, petechiae/purpura or persistent inconsolable crying."]],fav:false},
+{id:2,cat:"👶 Pediatrics",title:"Bronchiolitis – quick notes",tags:"pediatrics cough wheeze bronchiolitis",body:"Usually a clinical diagnosis. Management is mainly supportive.",sections:[["Clinical features","Coryzal symptoms followed by cough, tachypnea and wheeze/crackles."],["Assessment","Feeding, hydration, oxygen saturation and work of breathing."],["Management","Mainly supportive; follow current guidance."]],fav:false},
+{id:3,cat:"💉 Vaccination",title:"Childhood vaccination – index",tags:"vaccination immunization child",body:"Keep a current national immunization schedule.",sections:[["Recording","Vaccine name, dose, route, site, date and batch/lot where appropriate."],["Verification","Verify the latest applicable immunization schedule before clinical use."]],fav:false},
+{id:4,cat:"💊 Drugs",title:"Drug reference template",tags:"drug dose contraindication interaction",body:"Generic name and clinical reference.",sections:[["Generic name",""],["Indications",""],["Adult dose",""],["Pediatric dose",""],["Maximum dose",""],["Contraindications",""],["Renal/hepatic adjustment",""],["Important interactions",""],["Monitoring",""]],fav:false},
+{id:5,cat:"🚑 Emergency",title:"Emergency assessment – ABCDE",tags:"emergency ABCDE resuscitation",body:"A: Airway. B: Breathing. C: Circulation. D: Disability. E: Exposure.",sections:[["A – Airway","Airway assessment."],["B – Breathing","Breathing and SpO₂."],["C – Circulation","Pulse, BP and perfusion."],["D – Disability","Mental status and glucose."],["E – Exposure","Exposure and focused examination."]],fav:false}
 ];
-let data=JSON.parse(localStorage.getItem("rb_clinical_notes")||"null")||starter;
-let categories=JSON.parse(localStorage.getItem("rb_clinical_categories")||"null");
-if(!Array.isArray(categories)||!categories.length){
-  categories=[...new Set(data.map(n=>n.cat))].map((name,i)=>({id:"cat_"+i,name}));
-  localStorage.setItem("rb_clinical_categories",JSON.stringify(categories));
+
+let data=JSON.parse(localStorage.getItem("rb_clinical_notes_v3")||"null");
+if(!Array.isArray(data)){
+  const old=JSON.parse(localStorage.getItem("rb_clinical_notes_v2")||localStorage.getItem("rb_clinical_notes")||"null");
+  data=Array.isArray(old)?old:starter;
 }
-function syncCategories(){let known=new Set(categories.map(c=>c.name));data.forEach(n=>{if(!known.has(n.cat)){categories.push({id:"cat_"+Date.now()+"_"+Math.random().toString(36).slice(2,6),name:n.cat});known.add(n.cat)}});localStorage.setItem("rb_clinical_categories",JSON.stringify(categories))}
-syncCategories();
-const app=document.getElementById("app"), search=document.getElementById("search"), installBtn=document.getElementById("install");
-function save(){localStorage.setItem("rb_clinical_notes",JSON.stringify(data));localStorage.setItem("rb_clinical_categories",JSON.stringify(categories))}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+data=data.map(n=>({...n,sections:Array.isArray(n.sections)&&n.sections.length?n.sections:[["Details",n.body||""]]}));
+
+let categories=JSON.parse(localStorage.getItem("rb_clinical_categories_v3")||"null");
+if(!Array.isArray(categories)||!categories.length){
+  categories=[...new Set(data.map(n=>n.cat||"📁 General"))].map((name,i)=>({id:"cat_"+i,name}));
+}
+function save(){
+  localStorage.setItem("rb_clinical_notes_v3",JSON.stringify(data));
+  localStorage.setItem("rb_clinical_categories_v3",JSON.stringify(categories));
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+function secs(n){return Array.isArray(n.sections)&&n.sections.length?n.sections:[["Details",n.body||""]]}
+function body(n){return secs(n).map(s=>s[1]||"").join("\n\n")}
+const app=document.getElementById("app"),search=document.getElementById("search");
 
 function home(){
-  search.value="";
-  app.innerHTML=`<div class="title">Quick Access</div>
-  <div class="grid">${categories.map(c=>`<div class="card" data-category="${esc(c.name)}">
-    <div class="actions" style="justify-content:space-between;align-items:center">
-      <b>${esc(c.name)}</b>
-      <span class="actions">
-        <button type="button" class="btn" data-edit-category="${esc(c.id)}" aria-label="Edit ${esc(c.name)}">✏️</button>
-        <button type="button" class="btn" data-add-category-note="${esc(c.name)}" aria-label="Add note to ${esc(c.name)}">＋</button>
-      </span>
-    </div>
-    <span class="muted">${data.filter(n=>n.cat===c.name).length} notes</span>
-  </div>`).join("")}</div>
-  <div class="actions" style="margin:12px 0">
-    <button type="button" class="btn primary" data-action="add-category">＋ Add new card / category</button>
-    <button type="button" class="btn" data-action="manage-categories">⚙️ Manage cards</button>
-  </div>
-  <div class="title">Tools</div>
-  <div class="grid">
-    <button type="button" class="card" data-action="calculators"><b>🧮 Calculators</b><span class="muted">Dose & fluid mathematics</span></button>
-    <button type="button" class="card" data-action="add"><b>＋ Add clinical note</b><span class="muted">Your own searchable notes</span></button>
-  </div>
-  <div class="warn">Personal reference app. Verify current guidelines, formularies and patient-specific dosing before clinical use. Do not store identifiable patient information in this simple app.</div>`
+ search.value="";
+ app.innerHTML=`<div class="title">Quick Access</div>
+ <div class="grid">${categories.map(c=>`<div class="card" data-category="${esc(c.name)}">
+  <div class="actions" style="justify-content:space-between"><b>${esc(c.name)}</b>
+   <span class="actions"><button class="btn" data-edit-category="${esc(c.id)}">✏️</button><button class="btn" data-add-topic="${esc(c.name)}">＋</button></span>
+  </div><span class="muted">${data.filter(n=>n.cat===c.name).length} topics</span>
+ </div>`).join("")}</div>
+ <div class="actions" style="margin:12px 0">
+  <button class="btn primary" data-action="add-category">＋ Add main headline</button>
+  <button class="btn" data-action="manage-categories">⚙️ Manage headlines</button>
+  <button class="btn" data-action="add">＋ Add clinical topic</button>
+ </div>
+ <div class="warn">Multipurpose personal clinical reference. Verify current guidelines, formularies and patient-specific safety before clinical use. Avoid identifiable patient information.</div>`;
 }
 
-function notesView(){search.value="";render(data)}
-function favorites(){search.value="";render(data.filter(n=>n.fav))}
-function category(c){
-  search.value="";
-  let arr=data.filter(n=>n.cat===c);
-  app.innerHTML=`<div class="actions">
-    <button type="button" class="btn" data-action="home">← Home</button>
-    <button type="button" class="btn primary" data-add-category-note="${esc(c)}">＋ Add note to ${esc(c)}</button>
-    <button type="button" class="btn" data-edit-category-name="${esc(c)}">✏️ Edit card</button>
-  </div>
-  <div class="title">${esc(c)}</div>
-  ${arr.length?arr.map(n=>`<article class="note">
-    <span class="tag">${esc(n.cat)}</span><h3>${esc(n.title)}</h3>
-    <div class="muted">${esc(n.tags||"")}</div><p>${esc(n.body).replace(/\n/g,"<br>")}</p>
-    <div class="actions">
-      <button type="button" class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button>
-      <button type="button" class="btn" data-edit-note="${n.id}">Edit</button>
-      <button type="button" class="btn danger" data-delete-note="${n.id}">Delete</button>
-    </div>
-  </article>`).join(""):'<div class="empty">No notes in this card yet. Tap “Add note” to write your first detail.</div>'}`
+function category(name){
+ search.value="";
+ const arr=data.filter(n=>n.cat===name);
+ app.innerHTML=`<div class="actions"><button class="btn" data-action="home">← Home</button>
+ <button class="btn primary" data-add-topic="${esc(name)}">＋ Add topic</button>
+ <button class="btn" data-edit-category-name="${esc(name)}">✏️ Edit headline</button></div>
+ <div class="title">${esc(name)}</div>
+ <div class="muted">Main headline → multiple diseases/topics.</div>
+ ${arr.length?arr.map(n=>`<article class="note"><h3>${esc(n.title)}</h3><div class="muted">${esc(n.tags||"")}</div>
+ <div class="actions"><button class="btn primary" data-open-topic="${n.id}">Open</button><button class="btn" data-edit-note="${n.id}">Edit</button><button class="btn danger" data-delete-note="${n.id}">Delete</button><button class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button></div></article>`).join(""):'<div class="empty">No topics yet.</div>'}`;
+}
+
+async function openTopic(id){
+ const n=data.find(x=>x.id===id);if(!n)return;
+ const attachments=await listAttachments(id);
+ app.innerHTML=`<div class="actions"><button class="btn" data-open-category="${esc(n.cat)}">← ${esc(n.cat)}</button>
+ <button class="btn" data-edit-note="${n.id}">✏️ Edit</button><button class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button></div>
+ <div class="title">${esc(n.title)}</div><div class="muted">${esc(n.tags||"")}</div>
+ ${secs(n).map(s=>`<article class="note"><h3>${esc(s[0]||"Details")}</h3><p>${esc(s[1]||"").replace(/\n/g,"<br>")}</p></article>`).join("")}
+ <div class="panel"><h3>📎 Pictures & PDFs</h3>
+ <input id="attPicker" type="file" accept="image/*,.pdf,application/pdf" multiple>
+ <div class="muted">Attach photos, screenshots or PDF reference files to this topic. Saved locally on this iPhone/browser.</div>
+ <div id="attList">${attachments.length?attachments.map(attRow).join(""):'<div class="empty">No attachments yet.</div>'}</div></div>
+ <div class="actions"><button class="btn primary" data-edit-note="${n.id}">✏️ Edit topic</button><button class="btn danger" data-delete-note="${n.id}">Delete topic</button></div>`;
+ const picker=document.getElementById("attPicker");
+ picker.onchange=async e=>{
+  for(const f of e.target.files){
+   if(!(f.type||"").startsWith("image/")&&f.type!=="application/pdf"){alert("Please choose a picture or PDF.");continue}
+   await addAttachment(id,f);
+  }
+  e.target.value="";await refreshAttList(id);
+ };
 }
 
 function render(arr){
-  app.innerHTML=arr.length?arr.map(n=>`<article class="note">
-    <span class="tag">${esc(n.cat)}</span><h3>${esc(n.title)}</h3>
-    <div class="muted">${esc(n.tags||"")}</div><p>${esc(n.body).replace(/\n/g,"<br>")}</p>
-    <div class="actions">
-      <button type="button" class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button>
-      <button type="button" class="btn" data-edit-note="${n.id}">Edit</button>
-      <button type="button" class="btn danger" data-delete-note="${n.id}">Delete</button>
-    </div>
-  </article>`).join(""):'<div class="empty">No matching notes.</div>'
+ app.innerHTML=arr.length?arr.map(n=>`<article class="note"><span class="tag">${esc(n.cat)}</span><h3>${esc(n.title)}</h3>
+ <div class="muted">${esc(n.tags||"")}</div><p>${esc(body(n)).replace(/\n/g,"<br>")}</p>
+ <div class="actions"><button class="btn primary" data-open-topic="${n.id}">Open</button><button class="btn" data-fav="${n.id}">${n.fav?"★":"☆"} Favorite</button><button class="btn" data-edit-note="${n.id}">Edit</button><button class="btn danger" data-delete-note="${n.id}">Delete</button></div></article>`).join(""):'<div class="empty">No matching topics.</div>';
 }
 
-function add(){form()}
-function edit(id){form(data.find(n=>n.id===id))}
 function form(n=null){
-  n=n||{id:0,cat:(categories[0]?.name||"📁 General"),title:"",tags:"",body:""};
-  app.innerHTML=`<div class="panel">
-    <div class="actions"><button type="button" class="btn" data-action="home">← Home</button></div>
-    <div class="title">${n.id?"Edit":"Add"} clinical note</div>
-    <label>Category / Card</label>
-    <select id="cat">${categories.map(c=>`<option value="${esc(c.name)}" ${c.name===n.cat?"selected":""}>${esc(c.name)}</option>`).join("")}</select>
-    <label>Title</label><input id="ttl" value="${esc(n.title)}" placeholder="e.g. Acute asthma approach">
-    <label>Search tags</label><input id="tags" value="${esc(n.tags||"")}" placeholder="e.g. asthma, emergency, pediatric">
-    <label>Note / Details</label><textarea id="body" placeholder="Write your clinical details here...">${esc(n.body)}</textarea>
-    <div class="actions">
-      <button type="button" class="btn primary" data-save-note="${n.id}">Save</button>
-      <button type="button" class="btn" data-action="home">Cancel</button>
-    </div>
-  </div>`
+ n=n||{id:0,cat:categories[0]?.name||"📁 General",title:"",tags:"",sections:[["Clinical features",""],["Investigations",""],["My OPD Notes / Treatment",""],["Advice / Follow-up",""]]};
+ const ss=secs(n);
+ app.innerHTML=`<div class="panel"><div class="actions"><button class="btn" data-action="home">← Home</button></div>
+ <div class="title">${n.id?"Edit":"Add"} clinical topic</div>
+ <label>Main headline / Category</label><select id="cat">${categories.map(c=>`<option value="${esc(c.name)}" ${c.name===n.cat?"selected":""}>${esc(c.name)}</option>`).join("")}</select>
+ <label>Disease / Topic name</label><input id="ttl" value="${esc(n.title)}" placeholder="e.g. Leucorrhoea">
+ <label>Search tags</label><input id="tags" value="${esc(n.tags||"")}" placeholder="e.g. leucorrhoea, discharge, gynae">
+ <div class="title">Detailed sections</div><div id="sections">${ss.map(s=>sectionHTML(s[0],s[1])).join("")}</div>
+ <div class="actions"><button class="btn" data-add-section>＋ Add section</button><button class="btn primary" data-save-note="${n.id}">Save topic</button></div></div>`;
+}
+function sectionHTML(t,b){return `<div class="panel section-editor"><label>Section heading</label><input class="sec-title" value="${esc(t||"")}"><label>Details</label><textarea class="sec-body">${esc(b||"")}</textarea><button class="btn danger" data-remove-section>Remove section</button></div>`}
+
+function addCategory(){
+ app.innerHTML=`<div class="panel"><div class="title">＋ Add main headline</div><label>Headline name</label><input id="newCat" placeholder="e.g. 🩺 Gynaecology">
+ <div class="muted">You can create unlimited main headlines: Gynaecology, Pediatrics, Antibiotics, Emergency, etc.</div>
+ <div class="actions"><button class="btn primary" data-save-category>Save headline</button><button class="btn" data-action="home">Cancel</button></div></div>`;
+}
+function editCategory(id){
+ const c=categories.find(x=>x.id===id);if(!c)return;
+ app.innerHTML=`<div class="panel"><div class="title">✏️ Edit main headline</div><label>Headline name</label><input id="editCat" value="${esc(c.name)}">
+ <div class="actions"><button class="btn primary" data-update-category="${esc(id)}">Save</button><button class="btn danger" data-delete-category="${esc(id)}">Delete headline</button><button class="btn" data-action="home">Cancel</button></div></div>`;
+}
+function manageCategories(){
+ app.innerHTML=`<div class="actions"><button class="btn" data-action="home">← Home</button><button class="btn primary" data-action="add-category">＋ Add headline</button></div>
+ <div class="title">⚙️ Manage headlines</div>${categories.map(c=>`<article class="note"><h3>${esc(c.name)}</h3><div class="muted">${data.filter(n=>n.cat===c.name).length} topics</div>
+ <div class="actions"><button class="btn" data-edit-category="${esc(c.id)}">✏️ Edit</button><button class="btn" data-add-topic="${esc(c.name)}">＋ Add topic</button><button class="btn danger" data-delete-category="${esc(c.id)}">Delete</button></div></article>`).join("")}`;
 }
 
 function saveNote(id){
-  let old=data.find(n=>n.id===id);
-  let n={id:id||Date.now(),cat:document.getElementById("cat").value,title:document.getElementById("ttl").value.trim()||"Untitled",tags:document.getElementById("tags").value.trim(),body:document.getElementById("body").value.trim(),fav:old?old.fav:false};
-  data=id?data.map(x=>x.id===id?n:x):[n,...data];
-  syncCategories();save();category(n.cat)
-}
-function fav(id){let n=data.find(x=>x.id===id);if(n){n.fav=!n.fav;save()}notesView()}
-function removeNote(id){if(confirm("Delete this note?")){data=data.filter(n=>n.id!==id);save();notesView()}}
-
-function addCategory(){
-  app.innerHTML=`<div class="panel">
-    <div class="title">＋ Add new card / category</div>
-    <label>Card name</label><input id="newCat" placeholder="e.g. Gynaecology">
-    <div class="muted">You can include an emoji, for example: 🩺 Gynaecology</div>
-    <div class="actions">
-      <button type="button" class="btn primary" data-save-category>Save card</button>
-      <button type="button" class="btn" data-action="home">Cancel</button>
-    </div>
-  </div>`
+ const old=data.find(n=>n.id===id);
+ const sections=[...document.querySelectorAll(".section-editor")].map(el=>[el.querySelector(".sec-title").value.trim()||"Untitled section",el.querySelector(".sec-body").value]);
+ const n={id:id||Date.now(),cat:document.getElementById("cat").value,title:document.getElementById("ttl").value.trim()||"Untitled topic",tags:document.getElementById("tags").value.trim(),sections,body:sections.map(s=>s[1]).join("\n\n"),fav:old?.fav||false};
+ data=id?data.map(x=>x.id===id?n:x):[n,...data];save();openTopic(n.id);
 }
 function saveCategory(){
-  let name=document.getElementById("newCat").value.trim();
-  if(!name){alert("Please enter a card name.");return}
-  if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){alert("This card already exists.");return}
-  categories.push({id:"cat_"+Date.now(),name});save();home()
-}
-function editCategory(name){
-  let c=categories.find(x=>x.name===name); if(!c)return;
-  app.innerHTML=`<div class="panel">
-    <div class="title">✏️ Edit card</div>
-    <label>Card name</label><input id="editCat" value="${esc(c.name)}">
-    <div class="actions">
-      <button type="button" class="btn primary" data-update-category="${esc(c.id)}">Save changes</button>
-      <button type="button" class="btn danger" data-delete-category="${esc(c.id)}">Delete card</button>
-      <button type="button" class="btn" data-action="home">Cancel</button>
-    </div>
-    <div class="warn">Renaming a card also updates all notes currently inside that card. Deleting a card will ask you to confirm and will delete its notes.</div>
-  </div>`
+ const name=document.getElementById("newCat").value.trim();if(!name)return alert("Enter a headline name.");
+ if(categories.some(c=>c.name.toLowerCase()===name.toLowerCase()))return alert("This headline already exists.");
+ categories.push({id:"cat_"+Date.now(),name});save();home();
 }
 function updateCategory(id){
-  let c=categories.find(x=>x.id===id); if(!c)return;
-  let newName=document.getElementById("editCat").value.trim();
-  if(!newName){alert("Please enter a card name.");return}
-  if(categories.some(x=>x.id!==id&&x.name.toLowerCase()===newName.toLowerCase())){alert("This card already exists.");return}
-  let oldName=c.name;c.name=newName;
-  data=data.map(n=>n.cat===oldName?{...n,cat:newName}:n);
-  save();home()
+ const c=categories.find(x=>x.id===id),name=document.getElementById("editCat").value.trim();if(!c||!name)return;
+ if(categories.some(x=>x.id!==id&&x.name.toLowerCase()===name.toLowerCase()))return alert("This headline already exists.");
+ const old=c.name;c.name=name;data=data.map(n=>n.cat===old?{...n,cat:name}:n);save();home();
 }
 function deleteCategory(id){
-  let c=categories.find(x=>x.id===id);if(!c)return;
-  let count=data.filter(n=>n.cat===c.name).length;
-  if(confirm(`Delete "${c.name}" and its ${count} note(s)? This cannot be undone.`)){
-    categories=categories.filter(x=>x.id!==id);
-    data=data.filter(n=>n.cat!==c.name);
-    save();home()
-  }
+ const c=categories.find(x=>x.id===id);if(!c)return;
+ const count=data.filter(n=>n.cat===c.name).length;
+ if(confirm(`Delete "${c.name}" and its ${count} topic(s)?`)){data=data.filter(n=>n.cat!==c.name);categories=categories.filter(x=>x.id!==id);save();home();}
 }
-function manageCategories(){
-  app.innerHTML=`<div class="actions"><button type="button" class="btn" data-action="home">← Home</button><button type="button" class="btn primary" data-action="add-category">＋ Add card</button></div>
-  <div class="title">⚙️ Manage cards</div>
-  ${categories.map(c=>`<article class="note"><h3>${esc(c.name)}</h3><div class="muted">${data.filter(n=>n.cat===c.name).length} notes</div><div class="actions"><button type="button" class="btn" data-edit-category="${esc(c.id)}">✏️ Edit</button><button type="button" class="btn" data-add-category-note="${esc(c.name)}">＋ Add note</button><button type="button" class="btn danger" data-delete-category="${esc(c.id)}">Delete</button></div></article>`).join("")}`
+function deleteNote(id){
+ const n=data.find(x=>x.id===id);if(!n)return;
+ if(confirm(`Delete "${n.title}"?`)){deleteTopicAttachments(id);data=data.filter(x=>x.id!==id);save();category(n.cat);}
 }
-function calculators(){app.innerHTML=`<div class="panel"><div class="title">💊 Weight-based dose mathematics</div><label>Weight (kg)</label><input id="w" type="number" step="0.1"><label>Dose (mg/kg/dose)</label><input id="d" type="number" step="0.01"><button class="btn primary" onclick="doseCalc()">Calculate</button><div id="dr"></div></div><div class="panel"><div class="title">💧 4-2-1 maintenance fluid mathematics</div><label>Weight (kg)</label><input id="fw" type="number" step="0.1"><button class="btn primary" onclick="fluidCalc()">Calculate</button><div id="fr"></div></div><div class="panel"><div class="title">⚖️ Dose from concentration</div><label>Required dose (mg)</label><input id="need" type="number" step="0.01"><label>Concentration (mg/mL)</label><input id="conc" type="number" step="0.01"><button class="btn primary" onclick="volCalc()">Calculate</button><div id="vr"></div></div><div class="warn">Calculators perform arithmetic only. Confirm indication, dosing interval, maximum dose, concentration, contraindications, renal/hepatic adjustments and current clinical guidance before prescribing.</div>`}
-function doseCalc(){let w=+document.getElementById("w").value,d=+document.getElementById("d").value;document.getElementById("dr").innerHTML=w>0&&d>=0?`<div class="result">${(w*d).toFixed(2)} mg/dose</div>`:"Enter valid values."}
-function fluidCalc(){let w=+document.getElementById("fw").value;if(w<=0){fr.innerHTML="Enter valid weight.";return}let h=w<=10?4*w:w<=20?40+2*(w-10):60+w-20;fr.innerHTML=`<div class="result">${h.toFixed(1)} mL/hour</div><div class="muted">${(h*24).toFixed(0)} mL/day</div>`}
-function volCalc(){let n=+document.getElementById("need").value,c=+document.getElementById("conc").value;document.getElementById("vr").innerHTML=n>=0&&c>0?`<div class="result">${(n/c).toFixed(2)} mL</div>`:"Enter valid values."}
-search.addEventListener("input",()=>{let s=search.value.toLowerCase().trim();if(!s){home();return}render(data.filter(n=>(n.title+" "+n.cat+" "+n.tags+" "+n.body).toLowerCase().includes(s)))});
-app.addEventListener("click",e=>{
-  const card=e.target.closest("[data-category]");
-  if(card && !e.target.closest("button")){category(card.getAttribute("data-category"));return}
-  const action=e.target.closest("[data-action]");
-  if(action){
-    const a=action.getAttribute("data-action");
-    if(a==="home")home();
-    else if(a==="add")add();
-    else if(a==="calculators")calculators();
-    else if(a==="add-category")addCategory();
-    else if(a==="manage-categories")manageCategories();
-    return;
-  }
-  const addNote=e.target.closest("[data-add-category-note]");
-  if(addNote){form({id:0,cat:addNote.getAttribute("data-add-category-note"),title:"",tags:"",body:""});return}
-  const editCatBtn=e.target.closest("[data-edit-category]");
-  if(editCatBtn){let c=categories.find(x=>x.id===editCatBtn.getAttribute("data-edit-category"));if(c)editCategory(c.name);return}
-  const editCatName=e.target.closest("[data-edit-category-name]");
-  if(editCatName){editCategory(editCatName.getAttribute("data-edit-category-name"));return}
-  const saveCat=e.target.closest("[data-save-category]");
-  if(saveCat){saveCategory();return}
-  const updateCat=e.target.closest("[data-update-category]");
-  if(updateCat){updateCategory(updateCat.getAttribute("data-update-category"));return}
-  const deleteCat=e.target.closest("[data-delete-category]");
-  if(deleteCat){deleteCategory(deleteCat.getAttribute("data-delete-category"));return}
-  const saveNoteBtn=e.target.closest("[data-save-note]");
-  if(saveNoteBtn){saveNote(Number(saveNoteBtn.getAttribute("data-save-note")));return}
-  const editNote=e.target.closest("[data-edit-note]");
-  if(editNote){edit(Number(editNote.getAttribute("data-edit-note")));return}
-  const favBtn=e.target.closest("[data-fav]");
-  if(favBtn){fav(Number(favBtn.getAttribute("data-fav")));return}
-  const delNote=e.target.closest("[data-delete-note]");
-  if(delNote){removeNote(Number(delNote.getAttribute("data-delete-note")));return}
+
+async function openAttachment(id){
+ const a=await getAttachment(id);if(!a)return;
+ const u=URL.createObjectURL(a.blob);window.open(u,"_blank");setTimeout(()=>URL.revokeObjectURL(u),60000);
+}
+
+function backup(){
+ const blob=new Blob([JSON.stringify({version:3,exported:new Date().toISOString(),categories,data},null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="clinical-pocket-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function restore(file){
+ const r=new FileReader();r.onload=()=>{try{const p=JSON.parse(r.result);if(!Array.isArray(p.data)||!Array.isArray(p.categories))throw 0;data=p.data;categories=p.categories;save();home();alert("Notes/headlines restored. Attachments are stored separately on this device.")}catch(e){alert("Invalid backup file.")}};r.readAsText(file);
+}
+
+/* IndexedDB attachments */
+const ATT_DB="rb_clinical_attachments_v1";let attDB=null;
+function db(){return new Promise((res,rej)=>{if(attDB)return res(attDB);const q=indexedDB.open(ATT_DB,1);q.onupgradeneeded=()=>q.result.createObjectStore("files",{keyPath:"id"});q.onsuccess=()=>{attDB=q.result;res(attDB)};q.onerror=()=>rej(q.error)})}
+async function addAttachment(topicId,file){const d=await db(),id=topicId+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,7);return new Promise((res,rej)=>{const t=d.transaction("files","readwrite");t.objectStore("files").put({id,topicId,name:file.name,type:file.type,size:file.size,blob:file});t.oncomplete=()=>res(id);t.onerror=()=>rej(t.error)})}
+async function getAttachment(id){const d=await db();return new Promise((res,rej)=>{const q=d.transaction("files","readonly").objectStore("files").get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+async function listAttachments(topicId){const d=await db();return new Promise((res,rej)=>{const t=d.transaction("files","readonly"),a=[];const q=t.objectStore("files").openCursor();q.onsuccess=e=>{const c=e.target.result;if(!c)return res(a);if(c.value.topicId===topicId)a.push(c.value);c.continue()};q.onerror=()=>rej(q.error)})}
+async function deleteAttachment(id){const d=await db();return new Promise((res,rej)=>{const t=d.transaction("files","readwrite");t.objectStore("files").delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
+async function deleteTopicAttachments(id){for(const a of await listAttachments(id))await deleteAttachment(a.id)}
+function attRow(a){return `<div class="attachment"><span>${(a.type||"").startsWith("image/")?"🖼️":"📄"} ${esc(a.name)} <span class="muted">(${Math.ceil((a.size||0)/1024)} KB)</span></span><span class="actions"><button class="btn" data-open-att="${esc(a.id)}">Open</button><button class="btn danger" data-delete-att="${esc(a.id)}">Delete</button></span></div>`}
+async function refreshAttList(id){const el=document.getElementById("attList");if(!el)return;const a=await listAttachments(id);el.innerHTML=a.length?a.map(attRow).join(""):'<div class="empty">No attachments yet.</div>'}
+
+search.addEventListener("input",()=>{
+ const q=search.value.toLowerCase().trim();
+ if(!q){home();return}
+ render(data.filter(n=>(n.title+" "+n.cat+" "+n.tags+" "+body(n)+" "+secs(n).map(s=>s[0]).join(" ")).toLowerCase().includes(q)));
 });
-let deferred=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;installBtn.style.display="inline-block"});async function installApp(){if(deferred){deferred.prompt();await deferred.userChoice;deferred=null;installBtn.style.display="none"}else alert("On iPhone/iPad: open this app in Safari → Share → Add to Home Screen.");}
-if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
-home();
+
+app.addEventListener("click",async e=>{
+ const oa=e.target.closest("[data-open-att]");if(oa){await openAttachment(oa.getAttribute("data-open-att"));return}
+ const da=e.target.closest("[data-delete-att]");if(da){if(confirm("Delete this attachment?")){await deleteAttachment(da.getAttribute("data-delete-att"));await refreshAttList(document.querySelector("[data-open-topic]")?.getAttribute("data-open-topic")||"")}return}
+ const a=e.target.closest("[data-action]");
+ if(a){const x=a.getAttribute("data-action");if(x==="home")home();if(x==="add")form();if(x==="add-category")addCategory();if(x==="manage-categories")manageCategories();if(x==="backup")backup();return}
+ const cat=e.target.closest("[data-category]");if(cat&&!e.target.closest("button")){category(cat.getAttribute("data-category"));return}
+ const addT=e.target.closest("[data-add-topic]");if(addT){form({id:0,cat:addT.getAttribute("data-add-topic"),title:"",tags:"",sections:[["Clinical features",""],["Investigations",""],["My OPD Notes / Treatment",""],["Advice / Follow-up",""]]});return}
+ const ot=e.target.closest("[data-open-topic]");if(ot){await openTopic(Number(ot.getAttribute("data-open-topic")));return}
+ const oc=e.target.closest("[data-open-category]");if(oc){category(oc.getAttribute("data-open-category"));return}
+ const en=e.target.closest("[data-edit-note]");if(en){form(data.find(n=>n.id===Number(en.getAttribute("data-edit-note"))));return}
+ const dn=e.target.closest("[data-delete-note]");if(dn){await deleteNote(Number(dn.getAttribute("data-delete-note")));return}
+ const fv=e.target.closest("[data-fav]");if(fv){const n=data.find(x=>x.id===Number(fv.getAttribute("data-fav")));if(n){n.fav=!n.fav;save();await openTopic(n.id)}return}
+ const ec=e.target.closest("[data-edit-category]");if(ec){editCategory(ec.getAttribute("data-edit-category"));return}
+ const ecn=e.target.closest("[data-edit-category-name]");if(ecn){const c=categories.find(x=>x.name===ecn.getAttribute("data-edit-category-name"));if(c)editCategory(c.id);return}
+ const sc=e.target.closest("[data-save-category]");if(sc){saveCategory();return}
+ const uc=e.target.closest("[data-update-category]");if(uc){updateCategory(uc.getAttribute("data-update-category"));return}
+ const dc=e.target.closest("[data-delete-category]");if(dc){deleteCategory(dc.getAttribute("data-delete-category"));return}
+ const sn=e.target.closest("[data-save-note]");if(sn){saveNote(Number(sn.getAttribute("data-save-note")));return}
+ const as=e.target.closest("[data-add-section]");if(as){document.getElementById("sections").insertAdjacentHTML("beforeend",sectionHTML("New section",""));return}
+ const rs=e.target.closest("[data-remove-section]");if(rs){const all=document.querySelectorAll(".section-editor");if(all.length<=1)return alert("Keep at least one section.");rs.closest(".section-editor").remove();return}
+});
+
+document.addEventListener("change",e=>{if(e.target.id==="restoreInput"&&e.target.files[0])restore(e.target.files[0])});
+save();home();
 </script></body></html>
